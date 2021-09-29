@@ -2,6 +2,15 @@ from django.db import models
 from django.utils import timezone
 
 
+class Author(models.Model):
+    author_name = models.CharField(max_length=30)
+    email = models.EmailField()
+    is_notified = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.author_name
+
+
 class Category(models.Model):
     category_name = models.CharField(max_length=100)
 
@@ -14,6 +23,7 @@ class Post(models.Model):
     pub_date = models.DateTimeField('date published', default=timezone.now)
     opened = models.BooleanField(default=True)
     categories = models.ForeignKey(Category, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.post_text
