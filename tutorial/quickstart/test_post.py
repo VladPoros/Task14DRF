@@ -1,9 +1,10 @@
 from rest_framework.test import APIClient, APITestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from .models import Post, Category, Comment
+from .models import Post, Category, Comment, Author
 from rest_framework import status
 import coverage
+from .tasks import change_author_status
 
 cov = coverage.Coverage()
 cov.start()
@@ -19,14 +20,21 @@ class PostTest(APITestCase):
 
         self.category = Category.objects.create(category_name='Lesson')
 
+        self.new_author = Author.objects.create(
+            author_name="Vlad",
+            email="vlad@gmail.com",
+        )
+
         self.correct_post = {
             'post_text': 'Any post',
             'categories': 1,
+            'author': 1
         }
 
         self.wrong_post = {
             'post_text': "",
             'categories': 1,
+            'author': 1
         }
 
         self.correct_comment = {
@@ -42,6 +50,7 @@ class PostTest(APITestCase):
         Post.objects.create(
             post_text="English",
             categories=self.category,
+            author=self.new_author,
         )
 
     def test_post_list(self):
@@ -95,6 +104,14 @@ class PostTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Comment.objects.count(), 0)
+
+
+    def test_change_author_status_false_to_true(self):
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_token.key)
+
+        self.task = change_author_status()
+        self.assertEqual(Author.objects.get().is_notified, True)
 
 
 cov.stop()
