@@ -3,8 +3,8 @@ from rest_framework import permissions
 from tutorial.quickstart.serializers import *
 from tutorial.quickstart.models import *
 from rest_framework.views import APIView
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, status, filters
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -28,9 +28,13 @@ class PostView(viewsets.ModelViewSet):
     """
     API endpoint that allows post to be viewed, added, edited and deleted
     """
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["post_text"]
+    ordering_fields = ["pub_date", "author"]
 
 
 class CommentView(viewsets.ModelViewSet):
