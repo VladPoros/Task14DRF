@@ -19,6 +19,7 @@ class Category(models.Model):
 
 
 class Post(models.Model):
+    title = models.CharField(max_length=100, default='SOME STRING')
     post_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published', default=timezone.now)
     opened = models.BooleanField(default=True)
